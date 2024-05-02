@@ -8,6 +8,7 @@ import 'package:collection/collection.dart' show IterableExtension;
 import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 
 import 'a1_ref.dart';
 import 'gsheets_client.dart';
@@ -15,6 +16,18 @@ import 'utils.dart';
 
 const _sheetsEndpoint = 'https://sheets.googleapis.com/v4/spreadsheets/';
 const _filesEndpoint = 'https://www.googleapis.com/drive/v2/files/';
+final _logger = Logger('GCGSheets');
+final List<DateTime> _get_datetimes = [];
+
+void count_gets() {
+  final now = DateTime.now();
+  _get_datetimes.add();
+  one_min_ago = DateTime(now.year, now.month, now.day, now.hour, now.minute, now.second - 1, now.millisecond, now.microsecond);
+  _get_datetimes.removeWhere((dt) => dt.isBefore(one_min_ago));
+
+}
+
+
 
 /// [Exception] that throws gsheets.
 ///
@@ -202,6 +215,7 @@ class GSheets {
       _client = null;
       return this.client;
     });
+    _logger.info('Sending a get request');
     final response = await client.get('$_sheetsEndpoint$spreadsheetId'.toUri());
     checkResponse(response);
     return Spreadsheet._fromJson(
@@ -291,6 +305,7 @@ class GSheets {
     String spreadsheetId,
     List<Map<String, dynamic>> requests,
   ) async {
+    _logger.info('Sending a post request');
     final response = await client.post(
       '$_sheetsEndpoint$spreadsheetId:batchUpdate'.toUri(),
       body: jsonEncode({'requests': requests}),
@@ -636,6 +651,7 @@ class Spreadsheet {
     if (spreadsheetId.isEmpty || spreadsheetId == id) {
       throw GSheetsException('invalid spreadsheetId ($spreadsheetId)');
     }
+    _logger.info('Sending a post request');
     final response = await _client.post(
       '$_sheetsEndpoint$spreadsheetId/sheets/$sheetId:copyTo'.toUri(),
       body: jsonEncode({'destinationSpreadsheetId': id}),
@@ -1252,6 +1268,7 @@ class Worksheet {
 
   Future<bool> _clear(String range) async {
     final encodedRange = Uri.encodeComponent(range);
+    _logger.info('Sending a post request');
     final response = await _client.post(
       '$_sheetsEndpoint$spreadsheetId/values/$encodedRange:clear'.toUri(),
     );
@@ -1333,6 +1350,7 @@ class Worksheet {
 
   Future<List<String>> _get(String range, String dimension) async {
     final encodedRange = Uri.encodeComponent(range);
+    _logger.info('Sending a get request');
     final response = await _client.get(
       '$_sheetsEndpoint$spreadsheetId/values/$encodedRange?majorDimension=$dimension&valueRenderOption=$renderOption'
           .toUri(),
@@ -1348,7 +1366,7 @@ class Worksheet {
     bool fill,
   ) async {
     final encodedRange = Uri.encodeComponent(range);
-
+    _logger.info('Sending a get request');
     final response = await _client.get(
       '$_sheetsEndpoint$spreadsheetId/values/$encodedRange?majorDimension=$dimension&valueRenderOption=$renderOption'
           .toUri(),
@@ -1375,6 +1393,7 @@ class Worksheet {
   }) async {
     checkNotNested(values);
     final encodedRange = Uri.encodeComponent(range);
+    _logger.info('Sending a put request');
     final response = await _client.put(
       '$_sheetsEndpoint$spreadsheetId/values/$encodedRange?valueInputOption=$inputOption'
           .toUri(),
@@ -1396,6 +1415,7 @@ class Worksheet {
     required String range,
   }) async {
     final encodedRange = Uri.encodeComponent(range);
+    _logger.info('Sending a put request');
     final response = await _client.put(
       '$_sheetsEndpoint$spreadsheetId/values/$encodedRange?valueInputOption=$inputOption'
           .toUri(),
