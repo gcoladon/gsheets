@@ -19,13 +19,13 @@ const _filesEndpoint = 'https://www.googleapis.com/drive/v2/files/';
 final _logger = Logger('GCGSheets');
 final List<DateTime> _get_datetimes = [];
 
-void count_gets() {
-  final now = DateTime.now();
-  _get_datetimes.add();
-  one_min_ago = DateTime(now.year, now.month, now.day, now.hour, now.minute, now.second - 1, now.millisecond, now.microsecond);
-  _get_datetimes.removeWhere((dt) => dt.isBefore(one_min_ago));
+// void count_gets() {
+//   final now = DateTime.now();
+//   _get_datetimes.add();
+//   one_min_ago = DateTime(now.year, now.month, now.day, now.hour, now.minute, now.second - 1, now.millisecond, now.microsecond);
+//   _get_datetimes.removeWhere((dt) => dt.isBefore(one_min_ago));
 
-}
+// }
 
 
 
